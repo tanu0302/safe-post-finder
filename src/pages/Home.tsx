@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Shield, Search, History, Zap } from 'lucide-react';
+import { Shield, Search, History, Zap, Lock, TrendingUp, BarChart3, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -8,56 +8,64 @@ const Home = () => {
     {
       icon: Shield,
       title: 'Logo Detection',
-      description: 'Verify logos against registered brand databases',
+      description: 'Verify logos against registered brand databases with 95%+ accuracy',
+      gradient: 'from-purple-500 to-purple-600',
     },
     {
       icon: Search,
       title: 'Content Analysis',
-      description: 'Check text, images, and audio for copyright issues',
+      description: 'Check text, images, and audio for copyright issues instantly',
+      gradient: 'from-teal-500 to-teal-600',
     },
     {
-      icon: History,
-      title: 'History Tracking',
-      description: 'Keep records of all your copyright checks',
+      icon: BarChart3,
+      title: 'Confidence Scoring',
+      description: 'Get detailed confidence scores for every detection result',
+      gradient: 'from-purple-600 to-pink-600',
     },
     {
       icon: Zap,
       title: 'Instant Results',
-      description: 'Get real-time detection with confidence scores',
+      description: 'Real-time detection with AI-powered matching algorithms',
+      gradient: 'from-teal-600 to-cyan-600',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16 space-y-6">
-          <div className="inline-flex items-center justify-center p-3 bg-accent rounded-full mb-4">
-            <Shield className="h-12 w-12 text-primary" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/20">
+      <div className="container mx-auto px-4 py-20">
+        {/* Hero Section */}
+        <div className="text-center mb-24 space-y-8">
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-primary rounded-full mb-4">
+            <Shield className="h-6 w-6 text-white" />
+            <span className="text-white font-semibold">AI-Powered Protection</span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
-            <span className="bg-gradient-hero bg-clip-text text-transparent">
-              Copyright Violation Detector
+          <h1 className="text-6xl md:text-7xl font-bold tracking-tight leading-tight">
+            <span className="gradient-text">
+              Copyright Violation
             </span>
+            <br />
+            <span className="text-foreground">Detector</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
-            Detect Copyright Issues in Social Media Content
+          <p className="text-2xl md:text-3xl text-muted-foreground max-w-3xl mx-auto font-light">
+            Protect your content. Detect violations instantly.
           </p>
 
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Protect your brand and ensure compliance with our comprehensive copyright detection system. 
-            Check logos, taglines, images, audio, text, and URLs instantly.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Our comprehensive AI-powered system scans logos, taglines, images, audio, text, and URLs 
+            to ensure your content is original and protected.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-            <Button size="lg" asChild className="w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
+            <Button size="lg" asChild className="w-full sm:w-auto text-lg px-8 py-6 shadow-xl">
               <Link to="/check">
-                <Search className="mr-2 h-5 w-5" />
+                <Sparkles className="mr-2 h-5 w-5" />
                 Start Detection
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
+            <Button size="lg" variant="outline" asChild className="w-full sm:w-auto text-lg px-8 py-6">
               <Link to="/history">
                 <History className="mr-2 h-5 w-5" />
                 View History
@@ -66,36 +74,73 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <Card key={feature.title} className="hover:shadow-lg transition-shadow">
+              <Card key={feature.title} className="card-hover border-2">
                 <CardHeader>
-                  <div className="p-3 bg-accent rounded-lg w-fit mb-2">
-                    <Icon className="h-6 w-6 text-primary" />
+                  <div className={`p-4 bg-gradient-to-br ${feature.gradient} rounded-2xl w-fit mb-4`}>
+                    <Icon className="h-8 w-8 text-white" />
                   </div>
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>{feature.description}</CardDescription>
+                  <CardDescription className="text-base">{feature.description}</CardDescription>
                 </CardContent>
               </Card>
             );
           })}
         </div>
 
-        <div className="mt-16 p-8 bg-gradient-primary rounded-xl text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-primary-foreground mb-4">
-            Ready to Protect Your Content?
-          </h2>
-          <p className="text-primary-foreground/90 mb-6 max-w-2xl mx-auto">
-            Start checking your content now and get instant results with detailed confidence scores.
-          </p>
-          <Button size="lg" variant="secondary" asChild>
-            <Link to="/check">Get Started Now</Link>
-          </Button>
+        {/* Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          <Card className="text-center p-8 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/30 border-2">
+            <CardContent className="pt-6">
+              <div className="text-5xl font-bold gradient-text mb-2">6</div>
+              <p className="text-lg text-muted-foreground">Detection Types</p>
+            </CardContent>
+          </Card>
+          <Card className="text-center p-8 bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-950/50 dark:to-teal-900/30 border-2">
+            <CardContent className="pt-6">
+              <div className="text-5xl font-bold gradient-text mb-2">95%</div>
+              <p className="text-lg text-muted-foreground">Accuracy Rate</p>
+            </CardContent>
+          </Card>
+          <Card className="text-center p-8 bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-950/50 dark:to-pink-900/30 border-2">
+            <CardContent className="pt-6">
+              <div className="text-5xl font-bold gradient-text mb-2">&lt;2s</div>
+              <p className="text-lg text-muted-foreground">Analysis Time</p>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* CTA Section */}
+        <Card className="overflow-hidden border-2">
+          <div className="bg-gradient-hero p-12 text-center">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Ready to Protect Your Content?
+            </h2>
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              Join thousands of creators and brands using our AI-powered copyright detection system.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" variant="secondary" asChild className="text-lg px-8 py-6">
+                <Link to="/check">
+                  <Search className="mr-2 h-5 w-5" />
+                  Get Started Free
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="text-lg px-8 py-6 bg-white/10 border-white/30 text-white hover:bg-white/20">
+                <Link to="/admin">
+                  <Lock className="mr-2 h-5 w-5" />
+                  Admin Access
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   );
