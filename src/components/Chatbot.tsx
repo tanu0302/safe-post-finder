@@ -39,11 +39,8 @@ export const Chatbot = () => {
       });
 
       if (!resp.ok || !resp.body) {
-        if (resp.status === 429 || resp.status === 402) {
-          const data = await resp.json();
-          throw new Error(data.error || "Service temporarily unavailable");
-        }
-        throw new Error("Failed to start stream");
+        const data = await resp.json();
+        throw new Error(data.error || "Could not connect to AI");
       }
 
       const reader = resp.body.getReader();
@@ -110,7 +107,7 @@ export const Chatbot = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Sorry, something went wrong. Please try again.",
+        description: error instanceof Error ? `⚠ Error: ${error.message}` : "⚠ Error: Could not connect to AI",
         variant: "destructive",
       });
       setMessages(prev => prev.slice(0, -1));
@@ -200,7 +197,7 @@ export const Chatbot = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your question..."
+                placeholder="Ask me anything..."
                 disabled={isLoading}
                 className="flex-1"
               />
