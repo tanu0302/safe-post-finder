@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, Search, History, Settings, Sparkles } from 'lucide-react';
+import { Shield, Search, History, Settings, Sparkles, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const Navigation = () => {
@@ -40,6 +40,16 @@ export const Navigation = () => {
               <Link to="/check">
                 <Search className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Check</span>
+              </Link>
+            </Button>
+            <Button
+              variant={isActive('/ai-checker') ? 'default' : 'ghost'}
+              size="sm"
+              asChild
+            >
+              <Link to="/ai-checker">
+                <Brain className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">AI Checker</span>
               </Link>
             </Button>
             <Button
