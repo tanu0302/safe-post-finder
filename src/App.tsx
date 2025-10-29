@@ -11,6 +11,7 @@ import AITextChecker from "./pages/AITextChecker";
 import Results from "./pages/Results";
 import History from "./pages/History";
 import Admin from "./pages/Admin";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/results" element={<Results />} />
           <Route path="/history" element={<History />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Chatbot />
