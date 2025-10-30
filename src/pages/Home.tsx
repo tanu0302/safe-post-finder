@@ -43,7 +43,7 @@ const Home = () => {
           
           <h1 className="text-6xl md:text-7xl font-bold tracking-tight leading-tight">
             <span className="gradient-text">
-              Copyright Violation
+              RightCheck
             </span>
             <br />
             <span className="text-foreground">Detector</span>

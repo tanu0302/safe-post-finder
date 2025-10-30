@@ -16,7 +16,7 @@ export const Navigation = () => {
               <Shield className="h-5 w-5 text-white" />
             </div>
             <span className="gradient-text hidden sm:inline">
-              Copyright Shield
+              Rightcheck
             </span>
           </Link>
 
