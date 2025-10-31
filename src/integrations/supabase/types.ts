@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      logo_detections: {
+        Row: {
+          created_at: string
+          detections: Json
+          filename: string
+          id: string
+          image_url: string
+        }
+        Insert: {
+          created_at?: string
+          detections?: Json
+          filename: string
+          id?: string
+          image_url: string
+        }
+        Update: {
+          created_at?: string
+          detections?: Json
+          filename?: string
+          id?: string
+          image_url?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

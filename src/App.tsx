@@ -12,6 +12,8 @@ import Results from "./pages/Results";
 import History from "./pages/History";
 import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
+import LogoDetector from "./pages/LogoDetector";
+import DetectionHistory from "./pages/DetectionHistory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,8 @@ const App = () => (
           <Route path="/history" element={<History />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/logo-detector" element={<LogoDetector />} />
+          <Route path="/detection-history" element={<DetectionHistory />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Chatbot />
