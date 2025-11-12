@@ -354,8 +354,14 @@ export default function LogoDetector() {
                                     ))}
                                   </div>
                                 )}
-                                {detection.quality && (
+                                 {detection.quality && (
                                   <p className="text-xs text-muted-foreground">{detection.quality}</p>
+                                )}
+                                {detection.trademark_risk && (
+                                  <div className="mt-2 p-2 rounded-md bg-destructive/10 border border-destructive/20">
+                                    <p className="text-xs font-medium text-destructive">⚠️ Usage Rights:</p>
+                                    <p className="text-xs text-destructive/90">{detection.trademark_risk}</p>
+                                  </div>
                                 )}
                               </div>
                             ))}
@@ -368,7 +374,7 @@ export default function LogoDetector() {
                         )}
 
                         {item.result?.metadata && (
-                          <div className="mt-3 space-y-1">
+                          <div className="mt-3 space-y-2">
                             <Separator />
                             {item.result.metadata.image_quality && (
                               <p className="text-xs text-muted-foreground">
@@ -376,15 +382,24 @@ export default function LogoDetector() {
                               </p>
                             )}
                             {item.result.metadata.recommendations && item.result.metadata.recommendations.length > 0 && (
-                              <div className="text-xs text-muted-foreground">
-                                <span className="font-medium">Recommendations:</span>
-                                <ul className="list-disc list-inside mt-1">
-                                  {item.result.metadata.recommendations.slice(0, 2).map((rec, idx) => (
+                              <div className="p-2 rounded-md bg-amber-500/10 border border-amber-500/20">
+                                <p className="text-xs font-semibold text-amber-700 dark:text-amber-500">💡 Important Recommendations:</p>
+                                <ul className="list-disc list-inside mt-1 text-xs text-amber-600 dark:text-amber-400 space-y-1">
+                                  {item.result.metadata.recommendations.map((rec, idx) => (
                                     <li key={idx}>{rec}</li>
                                   ))}
                                 </ul>
                               </div>
                             )}
+                          </div>
+                        )}
+                        
+                        {item.result && item.result.detections.length > 0 && (
+                          <div className="mt-3 p-3 rounded-md bg-muted border border-border">
+                            <p className="text-xs font-medium mb-1">⚖️ Legal Disclaimer:</p>
+                            <p className="text-xs text-muted-foreground">
+                              This analysis is for informational purposes only. Consult a legal professional before using any detected logos commercially. Trademark rights belong to their respective owners.
+                            </p>
                           </div>
                         )}
                       </CardContent>

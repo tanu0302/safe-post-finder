@@ -272,11 +272,11 @@ export default function DetectionHistory() {
                 </CardHeader>
                 <CardContent>
                   {record.detections.length > 0 ? (
-                    <div className="space-y-2 mb-4">
-                      {record.detections.slice(0, 3).map((detection, idx) => (
-                        <div key={idx}>
+                    <div className="space-y-3 mb-4">
+                      {record.detections.slice(0, 2).map((detection, idx) => (
+                        <div key={idx} className="space-y-2">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="truncate flex-1">
+                            <span className="truncate flex-1 font-medium">
                               {detection.logo_name}
                             </span>
                             <Badge variant="secondary" className="ml-2">
@@ -284,7 +284,7 @@ export default function DetectionHistory() {
                             </Badge>
                           </div>
                           {detection.colors && detection.colors.length > 0 && (
-                            <div className="flex gap-1 mt-1">
+                            <div className="flex gap-1">
                               {detection.colors.slice(0, 5).map((color, cidx) => (
                                 <div
                                   key={cidx}
@@ -294,13 +294,23 @@ export default function DetectionHistory() {
                               ))}
                             </div>
                           )}
+                          {detection.trademark_risk && (
+                            <div className="p-2 rounded bg-destructive/10 border border-destructive/20">
+                              <p className="text-xs font-medium text-destructive">⚠️ {detection.trademark_risk}</p>
+                            </div>
+                          )}
                         </div>
                       ))}
-                      {record.detections.length > 3 && (
+                      {record.detections.length > 2 && (
                         <p className="text-xs text-muted-foreground">
-                          +{record.detections.length - 3} more
+                          +{record.detections.length - 2} more logo(s)
                         </p>
                       )}
+                      <div className="pt-2 mt-2 border-t">
+                        <p className="text-xs text-muted-foreground italic">
+                          ⚖️ Consult legal advice before commercial use
+                        </p>
+                      </div>
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground mb-4">
