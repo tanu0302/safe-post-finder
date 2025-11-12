@@ -57,6 +57,7 @@ serve(async (req) => {
 
     // Analyze image with Lovable AI
     console.log('Analyzing image with AI...');
+    const startTime = Date.now();
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -71,26 +72,41 @@ serve(async (req) => {
             content: [
               {
                 type: 'text',
-                text: `Analyze this image and detect all company logos, brand marks, or recognizable brand symbols. For each logo detected, provide:
+                text: `Analyze this image and detect all company logos, brand marks, or recognizable brand symbols. 
+
+For each logo detected, provide detailed analysis:
 1. Logo/brand name
-2. Confidence score (0-1, where 1 is extremely confident)
-3. Approximate bounding box coordinates as percentages of image dimensions (x, y, width, height where x,y is top-left corner)
+2. Confidence score (0-1)
+3. Bounding box coordinates as percentages (x, y, width, height)
+4. Dominant colors in the logo (hex codes)
+5. Logo quality assessment (clarity, resolution, visibility)
+6. Potential trademark concerns (generic vs distinctive)
 
-Return ONLY a JSON array in this exact format, nothing else:
-[
-  {
-    "logo_name": "Brand Name",
-    "confidence": 0.95,
-    "bbox": {
-      "x": 10.5,
-      "y": 20.3,
-      "width": 15.2,
-      "height": 8.7
+Also provide overall image analysis:
+- Total logos detected
+- Image quality assessment
+- Recommended actions
+
+Return ONLY a JSON object in this exact format:
+{
+  "detections": [
+    {
+      "logo_name": "Brand Name",
+      "confidence": 0.95,
+      "bbox": {"x": 10.5, "y": 20.3, "width": 15.2, "height": 8.7},
+      "colors": ["#FF0000", "#0000FF"],
+      "quality": "High clarity, well-positioned",
+      "trademark_risk": "Distinctive brand mark"
     }
+  ],
+  "metadata": {
+    "total_logos": 2,
+    "image_quality": "High resolution, good lighting",
+    "recommendations": ["Consider trademark search", "High commercial value"]
   }
-]
+}
 
-If no logos are detected, return an empty array: []`
+If no logos detected, return: {"detections": [], "metadata": {"total_logos": 0, "image_quality": "assessed", "recommendations": []}}`
               },
               {
                 type: 'image_url',
@@ -104,6 +120,8 @@ If no logos are detected, return an empty array: []`
         temperature: 0.3
       }),
     });
+    
+    const processingTime = Date.now() - startTime;
 
     if (!aiResponse.ok) {
       if (aiResponse.status === 429) {
@@ -128,21 +146,26 @@ If no logos are detected, return an empty array: []`
 
     const aiResult = await aiResponse.json();
     let detections = [];
+    let metadata = {};
     
     try {
-      const content = aiResult.choices?.[0]?.message?.content || '[]';
+      const content = aiResult.choices?.[0]?.message?.content || '{}';
       console.log('AI response:', content);
       
       // Extract JSON from response
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        detections = JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[0]);
+        detections = parsed.detections || [];
+        metadata = parsed.metadata || {};
       } else {
         detections = [];
+        metadata = {};
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
       detections = [];
+      metadata = {};
     }
 
     // Save detection result to database
@@ -151,7 +174,10 @@ If no logos are detected, return an empty array: []`
       .insert({
         filename: file.name,
         image_url: publicUrl,
-        detections: detections
+        detections: detections,
+        analysis_metadata: metadata,
+        processing_time_ms: processingTime,
+        status: 'completed'
       })
       .select()
       .single();
@@ -169,6 +195,8 @@ If no logos are detected, return an empty array: []`
       filename: file.name,
       image_url: publicUrl,
       detections: detections,
+      metadata: metadata,
+      processing_time_ms: processingTime,
       timestamp: detectionData.created_at
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
