@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.ai-text-detector]
 verify_jwt = false
+
+[functions.logo-detector]
+verify_jwt = false

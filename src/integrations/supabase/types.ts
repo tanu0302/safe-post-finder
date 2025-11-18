@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      logo_detections: {
+        Row: {
+          analysis_metadata: Json | null
+          created_at: string
+          detections: Json
+          filename: string
+          id: string
+          image_url: string
+          processing_time_ms: number | null
+          status: string | null
+        }
+        Insert: {
+          analysis_metadata?: Json | null
+          created_at?: string
+          detections?: Json
+          filename: string
+          id?: string
+          image_url: string
+          processing_time_ms?: number | null
+          status?: string | null
+        }
+        Update: {
+          analysis_metadata?: Json | null
+          created_at?: string
+          detections?: Json
+          filename?: string
+          id?: string
+          image_url?: string
+          processing_time_ms?: number | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
