@@ -119,7 +119,7 @@ export const Navigation = () => {
             >
               <Link to="/logo-detector">
                 <ScanSearch className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Logo AI</span>
+                <span className="hidden sm:inline"></span>
               </Link>
             </Button>
             <Button
@@ -129,7 +129,7 @@ export const Navigation = () => {
             >
               <Link to="/detection-history">
                 <History className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Detections</span>
+                <span className="hidden sm:inline"></span>
               </Link>
             </Button>
             <Button
