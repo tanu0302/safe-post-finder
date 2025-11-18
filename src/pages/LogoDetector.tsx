@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Upload, Loader2, CheckCircle, XCircle, X, Download } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -93,6 +92,50 @@ export default function LogoDetector() {
     });
   };
 
+  // Mock logo detection logic
+  const mockLogoDetection = async (file: File): Promise<DetectionResult> => {
+    await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+
+    const mockLogos = [
+      { name: "Nike", risk: "high", colors: ["#000000", "#FFFFFF"] },
+      { name: "Apple", risk: "high", colors: ["#000000", "#555555"] },
+      { name: "McDonald's", risk: "high", colors: ["#FFC72C", "#DA291C"] },
+      { name: "Coca-Cola", risk: "high", colors: ["#F40009", "#FFFFFF"] },
+      { name: "Google", risk: "high", colors: ["#4285F4", "#EA4335", "#FBBC05", "#34A853"] },
+    ];
+
+    const hasLogo = Math.random() > 0.3;
+    const detections: Detection[] = hasLogo ? [{
+      logo_name: mockLogos[Math.floor(Math.random() * mockLogos.length)].name,
+      confidence: 75 + Math.random() * 20,
+      bbox: {
+        x: Math.random() * 0.3,
+        y: Math.random() * 0.3,
+        width: 0.2 + Math.random() * 0.3,
+        height: 0.2 + Math.random() * 0.3,
+      },
+      colors: mockLogos[Math.floor(Math.random() * mockLogos.length)].colors,
+      quality: Math.random() > 0.5 ? "high" : "medium",
+      trademark_risk: mockLogos[Math.floor(Math.random() * mockLogos.length)].risk,
+    }] : [];
+
+    return {
+      id: Math.random().toString(36).substr(2, 9),
+      filename: file.name,
+      image_url: URL.createObjectURL(file),
+      detections,
+      metadata: {
+        total_logos: detections.length,
+        image_quality: Math.random() > 0.5 ? "high" : "good",
+        recommendations: detections.length > 0 
+          ? ["Trademark detected - verify usage rights", "Consider consulting legal expert"]
+          : ["No trademarks detected", "Safe to use with proper attribution"],
+      },
+      processing_time_ms: 1500 + Math.floor(Math.random() * 1000),
+      timestamp: new Date().toISOString(),
+    };
+  };
+
   const processAllImages = async () => {
     setProcessing(true);
     setCurrentProgress(0);
@@ -108,26 +151,19 @@ export default function LogoDetector() {
       ));
 
       try {
-        const formData = new FormData();
-        formData.append('file', item.file);
-
-        const { data, error } = await supabase.functions.invoke('logo-detector', {
-          body: formData,
-        });
-
-        if (error) throw error;
+        const result = await mockLogoDetection(item.file);
 
         setBatchItems(prev => prev.map((b, idx) => 
-          idx === itemIndex ? { ...b, status: 'completed', result: data } : b
+          idx === itemIndex ? { ...b, status: 'completed', result } : b
         ));
 
         toast({
           title: "Analysis Complete",
-          description: `${item.file.name}: Found ${data.detections.length} logo(s)`,
+          description: `${item.file.name}: Found ${result.detections.length} logo(s)`,
         });
       } catch (error: any) {
         console.error('Detection error:', error);
-        setBatchItems(prev => prev.map((b, idx) => 
+        setBatchItems(prev => prev.map((b, idx) =>
           idx === itemIndex ? { ...b, status: 'error', error: error.message } : b
         ));
         
@@ -142,6 +178,10 @@ export default function LogoDetector() {
     }
 
     setProcessing(false);
+    toast({
+      title: "Batch Complete",
+      description: `Processed ${pendingItems.length} image(s)`,
+    });
   };
 
   const downloadReport = (item: BatchItem) => {

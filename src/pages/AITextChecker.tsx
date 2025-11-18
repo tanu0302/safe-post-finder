@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Sparkles, Heart, Loader2, Brain, User } from 'lucide-react';
 
@@ -34,6 +33,71 @@ const AITextChecker = () => {
     }
   };
 
+  // Mock AI detection logic
+  const mockAIDetection = async (text: string): Promise<{ isAI: boolean; confidence: number }> => {
+    await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+
+    const aiIndicators = [
+      /in conclusion/gi,
+      /furthermore/gi,
+      /moreover/gi,
+      /it is important to note/gi,
+      /delve into/gi,
+      /comprehensive/gi,
+      /leverage/gi,
+      /robust/gi,
+      /cutting-edge/gi,
+      /state-of-the-art/gi,
+    ];
+
+    const humanIndicators = [
+      /\bi\b/gi,
+      /\bme\b/gi,
+      /\bmy\b/gi,
+      /lol/gi,
+      /haha/gi,
+      /basically/gi,
+      /like/gi,
+      /you know/gi,
+    ];
+
+    let aiScore = 0;
+    let humanScore = 0;
+
+    aiIndicators.forEach(pattern => {
+      const matches = text.match(pattern);
+      if (matches) aiScore += matches.length * 10;
+    });
+
+    humanIndicators.forEach(pattern => {
+      const matches = text.match(pattern);
+      if (matches) humanScore += matches.length * 8;
+    });
+
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    if (sentences.length > 3) {
+      const lengths = sentences.map(s => s.trim().split(/\s+/).length);
+      const avgLength = lengths.reduce((a, b) => a + b, 0) / lengths.length;
+      const variance = lengths.reduce((sum, len) => sum + Math.pow(len - avgLength, 2), 0) / lengths.length;
+      
+      if (variance < 20) aiScore += 15;
+      if (variance > 50) humanScore += 10;
+    }
+
+    const hasTypos = /\b(teh|recieve|occured|seperate|definately)\b/gi.test(text);
+    if (hasTypos) humanScore += 20;
+
+    const totalScore = aiScore + humanScore;
+    const aiProbability = totalScore > 0 ? aiScore / totalScore : 0.5;
+    const confidence = Math.min(95, Math.max(50, (aiProbability * 100) + (Math.random() - 0.5) * 20));
+    const isAI = aiProbability > 0.5;
+
+    return {
+      isAI,
+      confidence: Math.round(confidence),
+    };
+  };
+
   const handleAnalyze = async () => {
     if (!text.trim()) {
       toast.error('Please paste some text to analyze!');
@@ -49,11 +113,7 @@ const AITextChecker = () => {
     setResult(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke('ai-text-detector', {
-        body: { text: text.trim() }
-      });
-
-      if (error) throw error;
+      const data = await mockAIDetection(text.trim());
 
       const analysisResult: AnalysisResult = {
         isAI: data.isAI,
@@ -89,7 +149,7 @@ const AITextChecker = () => {
           <div className="mb-12 text-center space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-accent to-accent/50 rounded-full mb-2">
               <Brain className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">AI-Powered Analysis</span>
+              <span className="text-sm font-medium">AI-Powered Analysis (Mock Mode)</span>
             </div>
             <h1 className="text-5xl font-bold gradient-text">AI Text Checker</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
