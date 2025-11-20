@@ -117,20 +117,20 @@ export const Navigation = () => {
               size="sm"
               asChild
             >
-              <Link to="/logo-detector">
+              {/*<Link to="/logo-detector">
                 <ScanSearch className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline"></span>
-              </Link>
+              </Link>*/}
             </Button>
             <Button
               variant={isActive('/detection-history') ? 'default' : 'ghost'}
               size="sm"
               asChild
             >
-              <Link to="/detection-history">
+              {/*<Link to="/detection-history">
                 <History className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline"></span>
-              </Link>
+              </Link>*/}
             </Button>
             <Button
               variant={isActive('/dmca-takedown') ? 'default' : 'ghost'}
