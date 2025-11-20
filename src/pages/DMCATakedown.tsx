@@ -6,12 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Shield, Download, Copy, CheckCircle } from 'lucide-react';
+import { Shield, Download, Copy, CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const DMCATakedown = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<'intro' | 'form' | 'preview'>('intro');
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     yourName: '',
     yourEmail: '',
@@ -35,48 +36,47 @@ const DMCATakedown = () => {
     'Other',
   ];
 
-  const generateNotice = () => {
-    const notice = `DMCA TAKEDOWN NOTICE
+  const generateNotice = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dmca-generator`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            name: formData.yourName,
+            email: formData.yourEmail,
+            phone: formData.yourPhone,
+            address: formData.yourAddress,
+            workDescription: formData.workDescription,
+            originalLocation: formData.originalWorkUrl || 'Not provided',
+            infringingUrl: formData.infringingUrl,
+            platform: formData.platform,
+            infringementDescription: `Unauthorized use of my copyrighted work on ${formData.platform}`,
+            additionalInfo: '',
+          }),
+        }
+      );
 
-To: ${formData.platform} Copyright Agent
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to generate DMCA notice');
+      }
 
-Date: ${new Date().toLocaleDateString()}
-
-Dear Copyright Agent,
-
-I am writing to notify you of copyright infringement occurring on your platform.
-
-COPYRIGHT OWNER INFORMATION:
-Name: ${formData.yourName}
-Email: ${formData.yourEmail}
-Address: ${formData.yourAddress}
-Phone: ${formData.yourPhone}
-
-COPYRIGHTED WORK:
-Description: ${formData.workDescription}
-Original Location: ${formData.originalWorkUrl}
-
-INFRINGING MATERIAL:
-Location of Infringing Content: ${formData.infringingUrl}
-
-STATEMENTS:
-I have a good faith belief that the use of the copyrighted material described above is not authorized by the copyright owner, its agent, or the law.
-
-I swear, under penalty of perjury, that the information in this notification is accurate and that I am the copyright owner or am authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.
-
-SIGNATURE:
-${formData.yourName}
-${new Date().toLocaleDateString()}
-
-Please remove or disable access to the infringing material as soon as possible. I am available to provide any additional information you may need.
-
-Thank you for your prompt attention to this matter.
-
-Sincerely,
-${formData.yourName}`;
-
-    setGeneratedNotice(notice);
-    setStep('preview');
+      const data = await response.json();
+      setGeneratedNotice(data.notice);
+      setStep('preview');
+      toast.success('DMCA notice generated successfully!');
+    } catch (error) {
+      console.error('Error generating notice:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to generate notice. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCopy = () => {
@@ -294,6 +294,7 @@ ${formData.yourName}`;
                   className="w-full bg-gradient-to-r from-purple-600 to-teal-600 hover:from-purple-700 hover:to-teal-700"
                   onClick={generateNotice}
                   disabled={
+                    loading ||
                     !formData.yourName ||
                     !formData.yourEmail ||
                     !formData.yourAddress ||
@@ -303,7 +304,14 @@ ${formData.yourName}`;
                     !formData.infringingUrl
                   }
                 >
-                  Generate DMCA Notice
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating Notice...
+                    </>
+                  ) : (
+                    'Generate DMCA Notice'
+                  )}
                 </Button>
               </CardContent>
             </Card>
