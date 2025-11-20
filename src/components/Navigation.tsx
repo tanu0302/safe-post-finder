@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, Search, History, Settings, Sparkles, Brain, LogOut, LogIn, ScanSearch, Scale } from 'lucide-react';
+import { Shield, Search, History, Settings, Sparkles, Brain, LogOut, LogIn, ScanSearch, Scale, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -90,6 +90,16 @@ export const Navigation = () => {
               <Link to="/ai-checker">
                 <Brain className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">AI Checker</span>
+              </Link>
+            </Button>
+            <Button
+              variant={isActive('/audio-detector') ? 'default' : 'ghost'}
+              size="sm"
+              asChild
+            >
+              <Link to="/audio-detector">
+                <Music className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Audio</span>
               </Link>
             </Button>
             <Button

@@ -8,6 +8,7 @@ import { Chatbot } from "@/components/Chatbot";
 import Home from "./pages/Home";
 import Check from "./pages/Check";
 import AITextChecker from "./pages/AITextChecker";
+import AudioDetector from "./pages/AudioDetector";
 import Results from "./pages/Results";
 import History from "./pages/History";
 import Admin from "./pages/Admin";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/" element={<Home />} />
           <Route path="/check" element={<Check />} />
           <Route path="/ai-checker" element={<AITextChecker />} />
+          <Route path="/audio-detector" element={<AudioDetector />} />
           <Route path="/results" element={<Results />} />
           <Route path="/history" element={<History />} />
           <Route path="/admin" element={<Admin />} />
