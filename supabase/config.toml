@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.dmca-generator]
 verify_jwt = false
+
+[functions.audio-detector]
+verify_jwt = false
