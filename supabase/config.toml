@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.audio-detector]
 verify_jwt = false
+
+[functions.logo-detector]
+verify_jwt = false
