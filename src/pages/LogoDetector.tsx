@@ -97,6 +97,7 @@ export default function LogoDetector() {
   const formData = new FormData();
   formData.append("file", file);
 
+<<<<<<< HEAD
   const response = await fetch("http://localhost:5000/api/logo", {
     method: "POST",
     body: formData,
@@ -124,6 +125,55 @@ export default function LogoDetector() {
     processing_time_ms: data.processing_time_ms,
     timestamp: data.timestamp,
   }; };
+=======
+  // Call backend to detect logos
+  const detectLogo = async (file: File): Promise<DetectionResult> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/logo-detector`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to analyze image');
+    }
+
+    const data = await response.json();
+    
+    // Map backend response to frontend format
+    return {
+      id: data.id,
+      filename: data.filename,
+      image_url: data.imageUrl,
+      detections: data.detections.map((d: any) => ({
+        logo_name: d.name,
+        confidence: d.confidence / 100,
+        bbox: {
+          x: d.boundingBox?.x || 0,
+          y: d.boundingBox?.y || 0,
+          width: d.boundingBox?.width || 0,
+          height: d.boundingBox?.height || 0,
+        },
+      })),
+      metadata: {
+        total_logos: data.detections.length,
+        recommendations: data.detections.length > 0
+          ? ["Trademark detected - verify usage rights", "Consider consulting legal expert"]
+          : ["No trademarks detected", "Safe to use with proper attribution"],
+      },
+      timestamp: new Date().toISOString(),
+    };
+  };
+>>>>>>> 46407970be584be654bdf20e83dac6f440cba787
 
   const processAllImages = async () => {
     setProcessing(true);
@@ -140,7 +190,11 @@ export default function LogoDetector() {
       ));
 
       try {
+<<<<<<< HEAD
         const result = await detectlogo(item.file);
+=======
+        const result = await detectLogo(item.file);
+>>>>>>> 46407970be584be654bdf20e83dac6f440cba787
 
         setBatchItems(prev => prev.map((b, idx) => 
           idx === itemIndex ? { ...b, status: 'completed', result } : b

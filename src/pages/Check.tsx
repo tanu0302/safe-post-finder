@@ -31,30 +31,67 @@ const Check = () => {
 
     setLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const result = checkContent(type, content);
-    
-    // Store result in sessionStorage for the results page
-    sessionStorage.setItem('latestResult', JSON.stringify(result));
-    
-    // Store in history
-    const history = JSON.parse(localStorage.getItem('checkHistory') || '[]');
-    history.unshift(result);
-    localStorage.setItem('checkHistory', JSON.stringify(history.slice(0, 50)));
-    
-    setLoading(false);
-    
-    if (result.verdict === 'copyrighted') {
-      toast.error('Copyright violation detected!');
-    } else if (result.verdict === 'possibly') {
-      toast.warning('Possible copyright issue found');
-    } else {
-      toast.success('Content appears clear');
+    try {
+      let result: CheckResult;
+
+      // Use backend for tagline detection
+      if (type === 'tagline') {
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tagline-detector`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ tagline: content }),
+          }
+        );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to analyze tagline');
+        }
+
+        const data = await response.json();
+        
+        result = {
+          type: 'tagline',
+          verdict: data.verdict,
+          confidence: data.confidence,
+          content: content,
+          matchedItem: data.matchedBrand || data.matchedTagline || undefined,
+          timestamp: new Date(),
+          id: `check_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        };
+      } else {
+        // Use mock data for other types
+        result = checkContent(type, content);
+      }
+      
+      // Store result in sessionStorage for the results page
+      sessionStorage.setItem('latestResult', JSON.stringify(result));
+      
+      // Store in history
+      const history = JSON.parse(localStorage.getItem('checkHistory') || '[]');
+      history.unshift(result);
+      localStorage.setItem('checkHistory', JSON.stringify(history.slice(0, 50)));
+      
+      if (result.verdict === 'copyrighted') {
+        toast.error('Copyright violation detected!');
+      } else if (result.verdict === 'possibly') {
+        toast.warning('Possible copyright issue found');
+      } else {
+        toast.success('Content appears clear');
+      }
+      
+      navigate('/results');
+    } catch (error) {
+      console.error('Check error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to analyze content');
+    } finally {
+      setLoading(false);
     }
-    
-    navigate('/results');
   };
 
   const checkTypes = [
