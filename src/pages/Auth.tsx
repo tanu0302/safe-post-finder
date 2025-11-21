@@ -54,84 +54,95 @@ export default function Auth() {
       return false;
     }
   };
+  const handleregister = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateInputs(true)) return;
-
-    setLoading(true);
-    const redirectUrl = `${window.location.origin}/`;
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          username: username.trim(),
-        },
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        username: username.trim(),
+        email,
+        password,
+      }),
     });
 
-    setLoading(false);
+    const data = await res.json();
+    console.log("Register Response:", data);
 
-    if (error) {
-      if (error.message.includes('already registered')) {
-        toast({
-          title: "Account exists",
-          description: "This email is already registered. Please sign in instead.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Sign up failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-    } else {
+    if (!res.ok) {
       toast({
-        title: "Success!",
-        description: "Your account has been created. Welcome!",
+        title: "Signup failed",
+        description: data.message || "Error creating account",
+        variant: "destructive",
       });
-      navigate('/');
+      return;
     }
-  };
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateInputs(false)) return;
-
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    toast({
+      title: "Signup successful",
+      description: "Your account has been created!",
     });
 
-    setLoading(false);
+  } catch (err) {
+    toast({
+      title: "Error",
+      description: "Something went wrong during signup",
+      variant: "destructive",
+    });
+  }
+};
 
-    if (error) {
-      if (error.message.includes('Invalid login credentials')) {
-        toast({
-          title: "Sign in failed",
-          description: "Invalid email or password. Please try again.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Sign in failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-    } else {
+  const handlelogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username.trim(),
+        password,
+      }),
+    });
+
+    const data = await res.json();
+    console.log("Login Response:", data);
+
+    if (!res.ok) {
       toast({
-        title: "Welcome back!",
-        description: "You've successfully signed in.",
+        title: "Login failed",
+        description: data.message || "Invalid login credentials",
+        variant: "destructive",
       });
-      navigate('/');
+      return;
     }
-  };
+
+    toast({
+      title: "Login successful",
+      description: "You are now logged in",
+    });
+
+    // Save token (optional)
+    localStorage.setItem("token", data.token);
+
+  } catch (err) {
+    console.error("Login error:", err);
+
+    toast({
+      title: "Server Error",
+      description: "Backend not reachable",
+      variant: "destructive",
+    });
+  }
+};
+
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -148,9 +159,9 @@ export default function Auth() {
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
+              <form onSubmit={handlelogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">Email</Label>
                   <Input
@@ -178,9 +189,9 @@ export default function Auth() {
                 </Button>
               </form>
             </TabsContent>
-            
+
             <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
+              <form onSubmit={handleregister} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-username">Username</Label>
                   <Input

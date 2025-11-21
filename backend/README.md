@@ -1,25 +1,12 @@
-Safe Post Finder — Backend with Google Vision
---------------------------------------------
-This backend includes:
-- Auth (signup/login) with JWT
-- Detection routes for text (OCR), logo matching (phash), image analysis (labels), URL scanning
-- Google Vision integration (text, logos, label detection, web detection) when DETECTION_PROVIDER=google
-- History logging
+Clarifai Backend (logo detection) - Quickstart
+Files: index.js, routes/clarifai.js, package.json
 
-Quick start:
-1. Copy .env.example -> .env and edit (set MONGODB_URI and GOOGLE_APPLICATION_CREDENTIALS if using Google)
+Steps to run:
+1. Copy .env.example to .env and set CLARIFAI_API_KEY and (optionally) CLARIFAI_MODEL_ID.
 2. npm install
 3. npm start
+4. POST an image to http://localhost:5000/api/clarifai/logo as form-data file=<image>
 
-Endpoints:
-POST /api/auth/signup
-POST /api/auth/login
-POST /api/detect/text        (form field 'image')
-POST /api/detect/logo        (form field 'image')
-POST /api/detect/logo/register (form field 'image', body 'name')
-POST /api/detect/image       (general image analysis)
-POST /api/detect/url         (body { url })
-POST /api/detect/audio       (audio -> speech-to-text) [google only]
-GET  /api/history            (list recent checks)
-POST /api/history/save       (save a check result)
-GET  /api/admin/logos        (list logos)
+Notes:
+- This app sends the uploaded image to Clarifai's REST API as base64 and returns the model output.
+- You must have a Clarifai account and an API key. If you want to use a custom Clarifai model, set CLARIFAI_MODEL_ID to the model's id.

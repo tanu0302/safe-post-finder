@@ -211,9 +211,9 @@ const AITextChecker = () => {
                     } as React.CSSProperties}
                   />
                   <p className="text-sm text-muted-foreground text-center">
-                    {result.confidence >= 80 && "Very confident in this assessment"}
-                    {result.confidence >= 60 && result.confidence < 80 && "Fairly confident in this assessment"}
-                    {result.confidence < 60 && "Moderate confidence - mixed signals detected"}
+                    {result.confidence >= 60 && "Very confident in this assessment"}
+                    {result.confidence >= 40 && result.confidence < 60 && "Fairly confident in this assessment"}
+                    {result.confidence < 40 && "Moderate confidence - mixed signals detected"}
                   </p>
                 </div>
 
