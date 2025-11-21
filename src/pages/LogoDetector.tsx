@@ -92,46 +92,50 @@ export default function LogoDetector() {
     });
   };
 
-  // Mock logo detection logic
-  const mockLogoDetection = async (file: File): Promise<DetectionResult> => {
-    await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+  // Call backend to detect logos
+  const detectLogo = async (file: File): Promise<DetectionResult> => {
+    const formData = new FormData();
+    formData.append('file', file);
 
-    const mockLogos = [
-      { name: "Nike", risk: "high", colors: ["#000000", "#FFFFFF"] },
-      { name: "Apple", risk: "high", colors: ["#000000", "#555555"] },
-      { name: "McDonald's", risk: "high", colors: ["#FFC72C", "#DA291C"] },
-      { name: "Coca-Cola", risk: "high", colors: ["#F40009", "#FFFFFF"] },
-      { name: "Google", risk: "high", colors: ["#4285F4", "#EA4335", "#FBBC05", "#34A853"] },
-    ];
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/logo-detector`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: formData,
+      }
+    );
 
-    const hasLogo = Math.random() > 0.3;
-    const detections: Detection[] = hasLogo ? [{
-      logo_name: mockLogos[Math.floor(Math.random() * mockLogos.length)].name,
-      confidence: 75 + Math.random() * 20,
-      bbox: {
-        x: Math.random() * 0.3,
-        y: Math.random() * 0.3,
-        width: 0.2 + Math.random() * 0.3,
-        height: 0.2 + Math.random() * 0.3,
-      },
-      colors: mockLogos[Math.floor(Math.random() * mockLogos.length)].colors,
-      quality: Math.random() > 0.5 ? "high" : "medium",
-      trademark_risk: mockLogos[Math.floor(Math.random() * mockLogos.length)].risk,
-    }] : [];
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to analyze image');
+    }
 
+    const data = await response.json();
+    
+    // Map backend response to frontend format
     return {
-      id: Math.random().toString(36).substr(2, 9),
-      filename: file.name,
-      image_url: URL.createObjectURL(file),
-      detections,
+      id: data.id,
+      filename: data.filename,
+      image_url: data.imageUrl,
+      detections: data.detections.map((d: any) => ({
+        logo_name: d.name,
+        confidence: d.confidence / 100,
+        bbox: {
+          x: d.boundingBox?.x || 0,
+          y: d.boundingBox?.y || 0,
+          width: d.boundingBox?.width || 0,
+          height: d.boundingBox?.height || 0,
+        },
+      })),
       metadata: {
-        total_logos: detections.length,
-        image_quality: Math.random() > 0.5 ? "high" : "good",
-        recommendations: detections.length > 0 
+        total_logos: data.detections.length,
+        recommendations: data.detections.length > 0
           ? ["Trademark detected - verify usage rights", "Consider consulting legal expert"]
           : ["No trademarks detected", "Safe to use with proper attribution"],
       },
-      processing_time_ms: 1500 + Math.floor(Math.random() * 1000),
       timestamp: new Date().toISOString(),
     };
   };
@@ -151,7 +155,7 @@ export default function LogoDetector() {
       ));
 
       try {
-        const result = await mockLogoDetection(item.file);
+        const result = await detectLogo(item.file);
 
         setBatchItems(prev => prev.map((b, idx) => 
           idx === itemIndex ? { ...b, status: 'completed', result } : b
