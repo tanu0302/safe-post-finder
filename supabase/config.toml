@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.logo-detector]
 verify_jwt = false
+
+[functions.tagline-detector]
+verify_jwt = false
